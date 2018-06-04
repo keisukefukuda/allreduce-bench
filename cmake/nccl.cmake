@@ -17,6 +17,7 @@ else()
     target_compile_definitions(bench_nccl_cuda
       PUBLIC "-DTARGET_NCCL"
       PUBLIC "-DUSE_CUDA"
+      PUBLIC "-DHEADER=\"targets/nccl.h\""
       )
     target_link_libraries(bench_nccl_cuda ${NCCL_LIBRARY})
 

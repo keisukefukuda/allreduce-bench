@@ -20,8 +20,11 @@ foreach(cmakeFile ${cmakeFiles})
   INCLUDE(${cmakeFile})
 endforeach(cmakeFile)
 
+list(APPEND CXXFLAGS "-std=c++11 -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter")
+list(APPEND CUDA_NVCC_FLAGS "-std=c++11")
 
-set(CXXFLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter")
+CUDA_SELECT_NVCC_ARCH_FLAGS(ARCH "Pascal")
+list(APPEND CUDA_NVCC_FLAGS ${ARCH_FLAGS})
 
 if(USE_INPLACE)
   set(CXXFLAGS "${CXXFLAGS} -DUSE_INPLACE")

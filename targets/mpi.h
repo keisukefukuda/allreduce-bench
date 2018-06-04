@@ -9,44 +9,6 @@
 //////////////////////////////////////////////////////////////
 // MPI-related utilities
 
-// From https://github.com/keisukefukuda/tapas/blob/master/include/tapas/mpi_util.h
-
-template <class T>
-struct MPI_DatatypeTraits {
-    static MPI_Datatype type() { return MPI_BYTE; }
-    static constexpr bool IsEmbType() { return false; }
-
-    static constexpr int count(size_t n) { return sizeof(T) * n; }
-};
-
-#define DEF_MPI_DATATYPE(ctype_, mpitype_)                 \
-    template <>                                            \
-    struct MPI_DatatypeTraits<ctype_> {                    \
-        static MPI_Datatype type() { return mpitype_; }    \
-        static constexpr bool IsEmbType() { return true; } \
-        static constexpr int count(size_t n) { return n; } \
-    }
-
-DEF_MPI_DATATYPE(char, MPI_CHAR);
-DEF_MPI_DATATYPE(unsigned char, MPI_UNSIGNED_CHAR);
-DEF_MPI_DATATYPE(wchar_t, MPI_WCHAR);
-
-DEF_MPI_DATATYPE(short, MPI_SHORT);
-DEF_MPI_DATATYPE(unsigned short, MPI_UNSIGNED_SHORT);
-
-DEF_MPI_DATATYPE(int, MPI_INT);
-DEF_MPI_DATATYPE(unsigned int, MPI_UNSIGNED);
-
-DEF_MPI_DATATYPE(long, MPI_LONG);
-DEF_MPI_DATATYPE(unsigned long, MPI_UNSIGNED_LONG);
-
-DEF_MPI_DATATYPE(long long, MPI_LONG_LONG);
-DEF_MPI_DATATYPE(unsigned long long, MPI_UNSIGNED_LONG_LONG);
-
-DEF_MPI_DATATYPE(float, MPI_FLOAT);
-DEF_MPI_DATATYPE(double, MPI_DOUBLE);
-DEF_MPI_DATATYPE(long double, MPI_LONG_DOUBLE);
-
 
 template <class T>
 class Benchmark {
@@ -105,14 +67,14 @@ public:
 
 #ifdef USE_INPLACE
     void operator()(T* buf, int len) {
-        auto mpi_type = MPI_DatatypeTraits<T>::type();
+        auto mpi_type = mpiutil::MPI_DatatypeTraits<T>::type();
 
         int ret = MPI_Allreduce(MPI_IN_PLACE, reinterpret_cast<void*>(buf), len, mpi_type, MPI_SUM, MPI_COMM_WORLD);
         assert(ret == MPI_SUCCESS);
     }
 #else
     void operator()(const T* sendbuf, T* recvbuf, int len) {
-        auto mpi_type = MPI_DatatypeTraits<T>::type();
+        auto mpi_type = mpiutil::MPI_DatatypeTraits<T>::type();
 
         int ret =
             MPI_Allreduce(reinterpret_cast<const void*>(sendbuf), reinterpret_cast<void*>(recvbuf), len, mpi_type, MPI_SUM, MPI_COMM_WORLD);

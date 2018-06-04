@@ -47,18 +47,10 @@
 #include <thrust/host_vector.h>
 #endif
 
-#if defined(TARGET_MPI)
-#include "targets/mpi.h"
-#elif defined(TARGET_NCCL)
-#include "targets/nccl.h"
-#elif defined(TARGET_GLOO)
-#include "targets/gloo.h"
-#else
-#error "Please specify TARGET_XXX")
-#endif
-
 #include "mpi_util.h"
 #include "util.h"
+
+#include HEADER
 
 #define CUDACHECK(cmd)                                                                            \
     do {                                                                                          \
