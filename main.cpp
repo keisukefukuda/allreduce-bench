@@ -26,12 +26,14 @@
  *
  */
 #include <cassert>
+#include <cctype>
 #include <cerrno>
-#include <chrono>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+
+#include <chrono>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -93,7 +95,7 @@ public:
      * \brief Setup an output directory
      */
     void SetupOutputDir() { util::do_mkdir(out_dir_); }
-
+    
 #ifdef USE_CUDA
     void run_allreduce(int repeat, int array_size) {
         thrust::host_vector<ElementType> sendbuf(array_size);
@@ -175,6 +177,41 @@ void usage(int argc, char* argv[]) {
               << "{repeat}" << std::endl;
 }
 
+size_t parseArraySize(const char *arg) {
+    std::string digits;
+    std::string unit;
+
+    int i;
+
+    // read the number
+    for (i = 0; arg[i] != '\0'; i++) {
+        if (isdigit(arg[i])) {
+            digits += arg[i];
+        } else {
+            break;
+        }
+    }
+
+    for (;  arg[i] != '\0'; i++) {
+        unit += tolower(arg[i]);
+    }
+
+    size_t size = atoi(digits.c_str());
+
+    if (unit == "k" || unit == "kb") {
+        size *= 1024;
+    } else if (unit == "m" || unit == "mb") {
+        size *= 1024 * 1024;
+    } else if (unit == "g" || unit == "g") {
+        size *= 1024 * 1024 * 1024;
+    } else {
+        std::cerr << "Error: can't parse data size: '" << arg << "'" << std::endl;
+        exit(-1);
+    }
+
+    return size;
+}
+
 int main(int argc, char* argv[]) {
     using TargetType = float;
 
@@ -194,8 +231,7 @@ int main(int argc, char* argv[]) {
     std::string out_dir(argv[1]);
     assert(out_dir.size() > 0);
 
-    int array_len = atoi(argv[2]) / sizeof(TargetType);
-    assert(0 < array_len);
+    size_t array_len = parseArraySize(argv[2]) / sizeof(TargetType);
 
     // effect
     int repeat = atoi(argv[3]);
