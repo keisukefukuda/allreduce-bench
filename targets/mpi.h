@@ -31,9 +31,9 @@ public:
     std::string name() const {
         std::string name = 
 #if defined(OMPI_MAJOR_VERSION)
-            std::string("Open MPI-")
-            + std::to_string(OMPI_MAJOR_VERSION)
-            + std::to_string(OMPI_MINOR_VERSION)
+            std::string("OpenMPI-")
+            + std::to_string(OMPI_MAJOR_VERSION) + "_"
+            + std::to_string(OMPI_MINOR_VERSION) + "_"
             + std::to_string(OMPI_RELEASE_VERSION)
             ;
 #elif defined(MVAPICH2_VERSION)
