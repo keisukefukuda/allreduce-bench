@@ -30,6 +30,14 @@ class Benchmark {
 public:
     using ElementType = T;
     Benchmark(MPI_Comm comm = MPI_COMM_WORLD) : mpi_comm_(comm) {
+#if 0
+        long chunk_size = 8L * (1 << 10) * (1 << 10);
+        char envvar[100];
+        snprintf(envvar, 100, "%ld", chunk_size);
+        printf("IBCOMM_BUFFSIZE=%s\n", envvar);
+        setenv("IBCOMM_BUFFSIZE", envvar, 1);
+#endif
+
         MPI_Comm_rank(mpi_comm_, &rank_);
         MPI_Comm_size(mpi_comm_, &size_);
 

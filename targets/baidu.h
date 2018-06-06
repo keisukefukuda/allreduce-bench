@@ -6,6 +6,7 @@
 
 #include <mpi.h>
 
+// https://github.com/keisukefukuda/baidu-allreduce
 #include <collectives.cpp>  // Yes, I know. Don't say anything
 
 #ifndef USE_CUDA
