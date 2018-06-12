@@ -54,13 +54,14 @@
 
 #include HEADER
 
-#define CUDACHECK(cmd)                                                                            \
-    do {                                                                                          \
-        cudaError_t e = cmd;                                                                      \
-        if (e != cudaSuccess) {                                                                   \
-            printf("Failed: Cuda error %s:%d '%s'\n", __FILE__, __LINE__, cudaGetErrorString(e)); \
-            exit(EXIT_FAILURE);                                                                   \
-        }                                                                                         \
+#define CUDA_SAFE_CALL(cmd)                                     \
+    do {                                                        \
+        cudaError_t e = cmd;                                    \
+        if (e != cudaSuccess) {                                 \
+            printf("Failed: '" #cmd "' failed at %s:%d '%s'\n", \
+                   __FILE__, __LINE__, cudaGetErrorString(e));  \
+            exit(EXIT_FAILURE);                                 \
+        }                                                       \
     } while (0)
 
 
@@ -87,7 +88,7 @@ public:
         mpi_intra_rank_ = mpiutil::get_intra_rank();
 
 #ifdef USE_CUDA
-        CUDACHECK(cudaSetDevice(mpi_intra_rank_));
+        CUDA_SAFE_CALL(cudaSetDevice(mpi_intra_rank_));
 #endif
     }
 
@@ -106,9 +107,11 @@ public:
 
         util::create_rand_vector(sendbuf);
         gpu_sendbuf = sendbuf;
-        CUDACHECK(cudaStreamSynchronize(0));
+        CUDA_SAFE_CALL(cudaStreamSynchronize(0));
 
-        run_bench(repeat, thrust::raw_pointer_cast(gpu_sendbuf.data()), thrust::raw_pointer_cast(gpu_recvbuf.data()), array_size);
+        run_bench(repeat,
+                  thrust::raw_pointer_cast(gpu_sendbuf.data()),
+                  thrust::raw_pointer_cast(gpu_recvbuf.data()), array_size);
     }
 #else
     void run_allreduce(int repeat, int array_len) {
