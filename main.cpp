@@ -153,6 +153,9 @@ private:
 
         double elapsed;
         for (int i = 0; i < repeat; i++) {
+            if (mpi_rank_ == 0) {
+                std::cerr << "Running " << bench.name() << " [" << i << "/" << repeat << "]" << std::endl;
+            }
             start = std::chrono::system_clock::now();
 #ifdef USE_INPLACE
             bench(sendbuf, array_len);
