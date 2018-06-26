@@ -3,9 +3,10 @@
 
 #include <iostream>
 #include <sstream>
+#include <vector>
 
-#include <mpi.h>
 #include <ibverbs_communicator.h>
+#include <mpi.h>
 
 #ifndef USE_CUDA
 #error "PSCL is available only with CUDA"
@@ -43,25 +44,34 @@ public:
 
         ibcomm_.reset(new IBVerbsCommunicator(size_));
 
-        ibcomm_->registerMyself(rank_);
+        std::vector<uint32_t> qps(size_ * 3);
 
-        for (int i = 0; i < rank_; i++) {
-            ProcessInfo pinfo;
-            MPI_Recv(&pinfo, sizeof(pinfo), MPI_BYTE, i, 0, comm, MPI_STATUS_IGNORE);
-            pinfo = ibcomm_->registerProcess(i, pinfo);
-            MPI_Send(&pinfo, sizeof(pinfo), MPI_BYTE, i, 0, comm);
+        for (int i = 0; i < size_; i++) {
+            if (i == rank_) {
+                continue;
+            }
+            ProcessInfo pinfo = ibcomm_->createQueuePair(i);
+            qps[i * 3 + 0] = pinfo.lid;
+            qps[i * 3 + 1] = pinfo.qp_n;
+            qps[i * 3 + 2] = pinfo.psn;
         }
 
-        for (int i = rank_ + 1; i < size_; i++) {
-            auto pinfo = ibcomm_->createQueuePair(i);
-            MPI_Send(&pinfo, sizeof(pinfo), MPI_BYTE, i, 0, comm);
-            MPI_Recv(&pinfo, sizeof(pinfo), MPI_BYTE, i, 0, comm, MPI_STATUS_IGNORE);
-            ibcomm_->registerQueuePair(i, pinfo);
+        MPI_Alltoall(MPI_IN_PLACE, 3, MPI_UINT32_T, qps.data(), 3, MPI_UINT32_T, comm);
+
+        for (int i = 0; i < size_; i++) {
+            if (i == rank_) {
+                ibcomm_->registerMyself(i);
+            } else {
+                ProcessInfo pinfo;
+                pinfo.lid = qps[i * 3 + 0];
+                pinfo.qp_n = qps[i * 3 + 1];
+                pinfo.psn = qps[i * 3 + 2];
+                ibcomm_->registerQueuePair(i, pinfo);
+            }
         }
     }
 
-    ~Benchmark() {
-    }
+    ~Benchmark() {}
 
     //! return a boolean value if the Benchmark is CUDA-aware
     bool gpu() const { return true; }
