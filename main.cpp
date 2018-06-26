@@ -88,7 +88,9 @@ public:
         mpi_intra_rank_ = mpiutil::get_intra_rank();
 
 #ifdef USE_CUDA
-        CUDA_SAFE_CALL(cudaSetDevice(mpi_intra_rank_));
+        int gpu_devices;
+        CUDA_SAFE_CALL(cudaGetDeviceCount(&gpu_devices));
+        CUDA_SAFE_CALL(cudaSetDevice(mpi_intra_rank_ % gpu_devices));
 #endif
     }
 
