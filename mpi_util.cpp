@@ -19,7 +19,6 @@ int get_intra_rank() {
 
     if (ompi_local_rank) {
         int irank = atoi(ompi_local_rank);
-        assert(irank >= 0 && irank <= 8);  // maybe 16 or something in future
         return irank;
     }
 
@@ -27,7 +26,6 @@ int get_intra_rank() {
 
     if (mv2_local_rank) {
         int irank = atoi(mv2_local_rank);
-        assert(irank >= 0 && irank <= 8);  // maybe 16 or something in future
         return irank;
     }
 
