@@ -88,7 +88,9 @@ public:
         mpi_intra_rank_ = mpiutil::get_intra_rank();
 
 #ifdef USE_CUDA
-        CUDA_SAFE_CALL(cudaSetDevice(mpi_intra_rank_));
+        int gpu_devices;
+        CUDA_SAFE_CALL(cudaGetDeviceCount(&gpu_devices));
+        CUDA_SAFE_CALL(cudaSetDevice(mpi_intra_rank_ % gpu_devices));
 #endif
     }
 
@@ -156,6 +158,7 @@ private:
             if (mpi_rank_ == 0) {
                 std::cerr << "Running " << bench.name() << " [" << i << "/" << repeat << "]" << std::endl;
             }
+            MPI_Barrier(MPI_COMM_WORLD);
             start = std::chrono::system_clock::now();
 #ifdef USE_INPLACE
             bench(sendbuf, array_len);
