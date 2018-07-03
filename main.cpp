@@ -156,6 +156,7 @@ private:
             if (mpi_rank_ == 0) {
                 std::cerr << "Running " << bench.name() << " [" << i << "/" << repeat << "]" << std::endl;
             }
+            MPI_Barrier(MPI_COMM_WORLD);
             start = std::chrono::system_clock::now();
 #ifdef USE_INPLACE
             bench(sendbuf, array_len);
