@@ -1,5 +1,5 @@
-#ifndef ALLREDUCE_BENCH_LIB_PSCL_H
-#define ALLREDUCE_BENCH_LIB_PSCL_H
+#ifndef ALLREDUCE_BENCH_LIB_PSCL_RING_H
+#define ALLREDUCE_BENCH_LIB_PSCL_RING_H
 
 #include <iostream>
 #include <sstream>
@@ -76,7 +76,7 @@ public:
     //! return a boolean value if the Benchmark is CUDA-aware
     bool gpu() const { return true; }
     // return the name of the Benchmark
-    std::string name() const { return "PSCL"; }
+    std::string name() const { return "PSCL-RING"; }
 
     /**
      * \brief Return a log file name that indicates parameters of the run
@@ -94,7 +94,7 @@ public:
     }
 
 #ifdef USE_INPLACE
-#error "NCCL does not support in-place allreduce"
+#error "PSCL does not support in-place allreduce"
 #else
     void operator()(const T* sendbuf, T* recvbuf, int len) {
 #ifdef USE_CUDA
@@ -104,4 +104,4 @@ public:
 #endif
 };
 
-#endif  // ALLREDUCE_BENCH_LIB_PSCL_H
+#endif  // ALLREDUCE_BENCH_LIB_PSCL_RING_H
