@@ -98,6 +98,7 @@ public:
 #else
     void operator()(const T* sendbuf, T* recvbuf, int len) {
 #ifdef USE_CUDA
+        ibcomm_->setTimerBase();
         ibcomm_->allreduce_rabenseifner_cuda(sendbuf, recvbuf, len);
 #endif
     }
