@@ -5,7 +5,7 @@
 #include <sstream>
 #include <vector>
 
-#include <ibverbs_communicator.h>
+#include <ibcomm/ibverbs_communicator.h>
 #include <mpi.h>
 
 #ifndef USE_CUDA

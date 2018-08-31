@@ -1,6 +1,7 @@
 find_path(PSCL_INCLUDE_PATH
-  NAMES "ibverbs_communicator.h"
-  HINTS "${PSCL_ROOT}" "${PSCL_ROOT}/ibcomm")
+  NAMES "ibcomm/ibverbs_communicator.h"
+  HINTS "${PSCL_ROOT}"
+  )
 
 find_library(PSCL_LIBRARIES
   NAMES "ibcomm_cuda"
