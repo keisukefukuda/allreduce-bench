@@ -12,6 +12,7 @@
 #error "PFNPROTO is available only with CUDA"
 #endif
 
+#if 0
 #define CUDACHECK(cmd)                                                                            \
     do {                                                                                          \
         cudaError_t e = cmd;                                                                      \
@@ -20,6 +21,7 @@
             exit(EXIT_FAILURE);                                                                   \
         }                                                                                         \
     } while (0)
+#endif
 
 template <class T>
 class Benchmark {
@@ -50,7 +52,7 @@ public:
             if (i == rank_) {
                 continue;
             }
-            ProcessInfo pinfo = ibcomm_->createQueuePair(i);
+            ProcessInfo pinfo = ibcomm_->CreateQueuePair(i);
             qps[i * 3 + 0] = pinfo.lid;
             qps[i * 3 + 1] = pinfo.qp_n;
             qps[i * 3 + 2] = pinfo.psn;
@@ -60,13 +62,13 @@ public:
 
         for (int i = 0; i < size_; i++) {
             if (i == rank_) {
-                ibcomm_->registerMyself(i);
+                ibcomm_->RegisterMyself(i);
             } else {
                 ProcessInfo pinfo;
                 pinfo.lid = qps[i * 3 + 0];
                 pinfo.qp_n = qps[i * 3 + 1];
                 pinfo.psn = qps[i * 3 + 2];
-                ibcomm_->registerQueuePair(i, pinfo);
+                ibcomm_->RegisterQueuePair(i, pinfo);
             }
         }
     }
@@ -98,8 +100,8 @@ public:
 #else
     void operator()(const T* sendbuf, T* recvbuf, int len) {
 #ifdef USE_CUDA
-        ibcomm_->setTimerBase();
-        ibcomm_->ring_allreduce_cuda_pool(sendbuf, recvbuf, len);
+        ibcomm_->SetTimerBase();
+        ibcomm_->AllreduceRingCuda(sendbuf, recvbuf, len);
 #endif
     }
 #endif
