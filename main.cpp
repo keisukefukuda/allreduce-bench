@@ -54,14 +54,15 @@
 
 #include HEADER
 
-#define CUDA_SAFE_CALL(cmd)                                     \
-    do {                                                        \
-        cudaError_t e = cmd;                                    \
-        if (e != cudaSuccess) {                                 \
-            printf("Failed: '" #cmd "' failed at %s:%d '%s'\n", \
-                   __FILE__, __LINE__, cudaGetErrorString(e));  \
-            exit(EXIT_FAILURE);                                 \
-        }                                                       \
+#define CUDA_SAFE_CALL(cmd)                               \
+    do {                                                  \
+        cudaError_t e = cmd;                              \
+        if (e != cudaSuccess) {                           \
+            printf("Failed: '%s' failed at %s:%d '%s'\n", \
+                   #cmd, __FILE__, __LINE__,              \
+                   cudaGetErrorString(e));                \
+            exit(EXIT_FAILURE);                           \
+        }                                                 \
     } while (0)
 
 
@@ -98,7 +99,7 @@ public:
      * \brief Setup an output directory
      */
     void SetupOutputDir() { util::do_mkdir(out_dir_); }
-    
+
 #ifdef USE_CUDA
     void run_allreduce(int repeat, int array_size) {
         thrust::host_vector<ElementType> sendbuf(array_size);

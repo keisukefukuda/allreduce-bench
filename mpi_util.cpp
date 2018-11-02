@@ -38,7 +38,7 @@ int get_intra_rank() {
     char hostname[HN_LEN] = "";
     gethostname(hostname, HN_LEN);
 
-    int irank = -1;
+    int irank = -1;  // intra rank
     int mycolor;
 
     if (rank == 0) {
