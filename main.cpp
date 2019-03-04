@@ -214,6 +214,8 @@ size_t parseArraySize(const char *arg) {
         size *= 1024 * 1024;
     } else if (unit == "g" || unit == "g") {
         size *= 1024 * 1024 * 1024;
+    } else if (unit.size() == 0) {
+        size *= 1;
     } else {
         std::cerr << "Error: can't parse data size: '" << arg << "'" << std::endl;
         exit(-1);
