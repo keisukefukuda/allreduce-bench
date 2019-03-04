@@ -135,7 +135,7 @@ private:
      * \param repeat Number of repeat
      * \param sendbuf send buffer
      * \param recvbuf receive buffer
-     * \param array_len Length of the array (so the size is sizeof(T) * array_len
+     * \param array_len Length of the array (so the buffer size is sizeof(T) * array_len
      */
     void run_bench(int repeat, ElementType* sendbuf, ElementType* recvbuf, int array_len) {
         BenchmarkType bench(MPI_COMM_WORLD);
@@ -168,9 +168,10 @@ private:
 #endif
             end = std::chrono::system_clock::now();
 
+            size_t buf_size = sizeof(ElementType) * array_len;
             elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() / 1e9;
             if (mpi_rank_ == 0) {
-                fprintf(fp, "%s, %e\n", bench.name().c_str(), elapsed);
+                fprintf(fp, "%s, %lu, %e\n", bench.name().c_str(), buf_size, elapsed);
             }
         }
 
